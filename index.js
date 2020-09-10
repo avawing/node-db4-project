@@ -1,10 +1,29 @@
-const express = require('express')
-const helmet = require('helmet')
-const morgan = require('morgan')
+const express = require("express");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const data = require('./dbhelper');
 
-const server = express()
+const server = express();
 
-server.use(express.json(), helmet(), morgan('tiny'))
+server.use(express.json(), helmet(), morgan("tiny"));
 
-const PORT = 3333;
-server.listen(PORT => console.log("server listening!"))
+server.get("/", (req, res) => {
+  res.status(200).json({ message: "Hi" });
+});
+
+server.get('/recipes', (req, res)=>{
+    data.getRecipes()
+    .then(results => {
+        if(results.length){
+            res.status(200).json(results).end();
+        }else{
+            res.status(404).json(results).end()
+        }
+    })
+    .catch(err => {
+        res.status(500).json(err).end()
+    })
+})
+
+const port = process.env.PORT || 4000;
+server.listen(port, () => console.log(`Server listening on ${port}`));
